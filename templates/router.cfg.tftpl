@@ -1,0 +1,22 @@
+# ${name}: loopback, GRE to ${peer} over transit, eBGP across the tunnel
+# leaf values are single-quoted: cloud-init reads everything before the first quote as the path
+
+# loopback advertised into BGP
+set interfaces dummy dum0 address '${loopback}/32'
+set interfaces dummy dum0 description 'loopback'
+
+# GRE over transit (eth1); 1460 transit MTU less 24 bytes of GRE/IP overhead
+set interfaces tunnel tun0 encapsulation 'gre'
+set interfaces tunnel tun0 source-address '${transit_ip}'
+set interfaces tunnel tun0 remote '${peer_transit_ip}'
+set interfaces tunnel tun0 address '${tunnel_ip}/30'
+set interfaces tunnel tun0 mtu '1436'
+set interfaces tunnel tun0 description 'gre to ${peer}'
+
+# eBGP to ${peer}; VyOS does not require eBGP policy by default
+set protocols bgp system-as '${asn}'
+set protocols bgp parameters router-id '${loopback}'
+set protocols bgp neighbor ${peer_tunnel_ip} remote-as '${peer_asn}'
+set protocols bgp neighbor ${peer_tunnel_ip} description '${peer}'
+set protocols bgp neighbor ${peer_tunnel_ip} address-family ipv4-unicast
+set protocols bgp address-family ipv4-unicast network ${loopback}/32
