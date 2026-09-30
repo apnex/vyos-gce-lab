@@ -69,8 +69,9 @@ module "router" {
 
 ## one private key file per router for login.sh
 resource "local_sensitive_file" "ssh_private_key" {
-  for_each        = local.routers
-  content         = module.router[each.key].ssh_private_key
-  filename        = "${path.module}/.ssh/${each.key}"
-  file_permission = "0600"
+  for_each             = local.routers
+  content              = module.router[each.key].ssh_private_key
+  filename             = "${path.module}/.ssh/${each.key}"
+  file_permission      = "0600"
+  directory_permission = "0700"
 }

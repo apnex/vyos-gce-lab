@@ -3,19 +3,20 @@ A VyOS routing lab on GCE: two routers with a management and a transit network, 
 Routers are deployed with [`mod-gce-vyos`](https://github.com/apnex/mod-gce-vyos); the image comes from [`mod-vyos-image`](https://github.com/apnex/mod-vyos-image).
 
 ```
-                 mgmt 10.10.0.0/24  (ssh, external ips)
-          +-------------+-------------------+-------------+
-                        | eth0              | eth0
-                 +------+------+     +------+------+
-                 |  router-a   |     |  router-b   |
-                 |  AS 65001   |     |  AS 65002   |
-                 | lo 10.100.1.1|    | lo 10.100.2.1|
-                 +------+------+     +------+------+
-                        | eth1 .2           | eth1 .3
-          +-------------+-------------------+-------------+
-                 transit 10.255.0.0/24
-                        |==== tun0 GRE 10.200.0.0/30 ====|
-                              eBGP: 10.100.1.1 <-> 10.100.2.1
+                  mgmt 10.10.0.0/24  (ssh, external ips)
+        +---------------+-----------------------+---------------+
+                        | eth0                  | eth0
+                +-------+-------+       +-------+-------+
+                |   router-a    |       |   router-b    |
+                |   AS 65001    |       |   AS 65002    |
+                | lo 10.100.1.1 |       | lo 10.100.2.1 |
+                +-------+-------+       +-------+-------+
+                        | eth1 .2               | eth1 .3
+        +---------------+-----------------------+---------------+
+                  transit 10.255.0.0/24
+                        |=======================|
+                          tun0 GRE 10.200.0.0/30
+                          eBGP 10.100.1.1 <-> 10.100.2.1
 ```
 
 ### terraform.tfvars
@@ -54,7 +55,9 @@ terraform apply -auto-approve
 - `login.sh` - ssh into a router from the terraform outputs
 
 ### notes
+- Needs Terraform, `jq` for `login.sh`, and Google credentials that can create networks and instances (plus services, service accounts and IAM when the image is built here)
+- `image = null` builds the image pipeline with `mod-vyos-image` defaults; in a project that already runs that pipeline, pass its image instead
 - Router config is applied on first boot; changing the template or topology replaces the routers
 - Leaf values in the template must be single-quoted (`address '10.0.0.1/32'`)
 - A GCE VPC routes by destination, so prefixes learned over BGP are only reachable across the GRE tunnel, not natively over transit
-- Next: Network Connectivity Center router appliances and Cloud Router peering
+- Designed as the base for Network Connectivity Center router appliances and Cloud Router peering
