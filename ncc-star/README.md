@@ -65,7 +65,7 @@ gcloud network-connectivity hubs route-tables routes list --hub=vyos-ncc-hub --r
 - Needs Terraform, `jq` for `login.sh`, and Google credentials that can manage Network Connectivity Center, networks, load balancers and instances
 - NCC hubs do not exchange static routes, so each edge VPC carries its own route to the load balancer in the center spoke; the routes are defined once in `local.nva_routes` and created in every edge
 - `center_only_route = true` adds the same kind of route in the center VPC only; the edges never learn it, which shows the point above
-- Load balancer health checks are addressed to the forwarding rule IP, so the NVA holds that IP on a dummy interface (standard images get it from Google's guest agent)
+- Load balancer health checks are addressed to the forwarding rule IP; the image's Google guest agent adds it as a local route, as on standard GCE images (`mod-vyos-image` with `google_guest_agent = true`)
 - A replaced NVA keeps its name but drops out of the instance group; membership is re-created from its instance id
 - When all backends fail health checks, routes through the load balancer stay in effect
 - `image = null` builds the image pipeline with `mod-vyos-image` defaults; in a project that already runs that pipeline, pass its image instead

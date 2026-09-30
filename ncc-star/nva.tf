@@ -15,12 +15,8 @@ module "nva" {
       description = "center"
     },
   ]
-  # load balancer health checks are addressed to the forwarding rule IP; Google's guest agent
-  # adds it locally on standard images, VyOS has no guest agent, so hold it on a dummy interface
-  vyos_config = <<-EOT
-    set interfaces dummy dum0 address '${local.ilb_ip}/32'
-    set interfaces dummy dum0 description 'ilb vip for health checks'
-  EOT
+  # load balancer health checks are addressed to the forwarding rule IP; the image's Google
+  # guest agent adds it as a local route from instance metadata (forwarded IPs)
 }
 
 ## internal passthrough NLB in front of the NVA; as a route next hop it forwards all
