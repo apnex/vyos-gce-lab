@@ -22,8 +22,8 @@ Routers are deployed with [`mod-gce-vyos`](https://github.com/apnex/mod-gce-vyos
 ### terraform.tfvars
 ```
 project_id		= "my-project"
-region			= "australia-southeast1"
-zone			= "australia-southeast1-a"
+region			= "us-central1"
+zone			= "us-central1-a"
 ssh_source_ranges	= ["203.0.113.10/32"]	# your public ip
 image			= null			# or an existing image / family path; null builds one
 ```
